@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function logChat() {
     const chatInputSelector = '.msg-form__contenteditable';
     const chatInput = document.querySelector(chatInputSelector);
+    // If chat input is not found, assume we are in a chat
 
     function simulateClick(element) {
         ['mousedown', 'mouseup', 'click'].forEach(eventType => {
