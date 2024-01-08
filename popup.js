@@ -12,56 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
 function logChat() {
     const chatInputSelector = '.msg-form__contenteditable';
     const chatInput = document.querySelector(chatInputSelector);
-    // If chat input is not found, assume we are in a chat
 
     function simulateClick(element) {
         ['mousedown', 'mouseup', 'click'].forEach(eventType => {
             const event = new MouseEvent(eventType, { bubbles: true, cancelable: true, view: window });
             element.dispatchEvent(event);
         });
+    
+        // Dispatch a focus event
         element.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
     }
 
-function typeMessage(message, callback) {
-    const chatInputSelector = '.msg-form__contenteditable';
-    const chatInput = document.querySelector(chatInputSelector);
-
-    if (!chatInput) {
-        console.error('Chat input field not found');
-        return;
-    }
-
-    chatInput.focus();
-    simulateClick(chatInput);
-
-    let i = 0;
-    const typingSpeed = 100;
-    function typeChar() {
-        if (i < message.length) {
-            const char = message[i];
-            // Mimic the key events that normally occur when typing
-            ['keydown', 'keypress', 'keyup'].forEach(eventType => {
-                const keyEvent = new KeyboardEvent(eventType, {
-                    key: char,
-                    code: char.charCodeAt(0),
-                    bubbles: true,
-                    cancelable: true
-                });
-                chatInput.dispatchEvent(keyEvent);
-            });
-            
-            chatInput.innerHTML = `<p>${message.slice(0, i + 1)}</p>`; // Insert the character
-            chatInput.dispatchEvent(new InputEvent('input', { bubbles: true })); // Trigger the input event
-            
-            i++;
-            setTimeout(typeChar, typingSpeed);
-        } else {
-            chatInput.dispatchEvent(new Event('change', { bubbles: true })); // Trigger change event at the end
-            if (callback) callback();
+    function typeMessage(message, callback) {
+        const chatInputSelector = '.msg-form__contenteditable';
+        const chatInput = document.querySelector(chatInputSelector);
+        
+        if (!chatInput) {
+            console.error('Chat input field not found');
+            return;
         }
+    
+        // Focus the input field before typing
+        chatInput.focus();
+        simulateClick(chatInput);
+    
+        let i = 0;
+        function typeChar() {
+            if (i < message.length) {
+                // Wrap message in <p> tags to mimic the manual typing structure
+                chatInput.innerHTML = `<p>${message.slice(0, i + 1)}</p>`;
+                const evt = new InputEvent('input', { bubbles: true });
+                chatInput.dispatchEvent(evt);
+                i++;
+                // Randomize the delay to mimic human typing
+                const randomDelay = 100 + Math.random() * 100; // Between 100 and 200 milliseconds
+                setTimeout(typeChar, randomDelay);
+            } else {
+                if (callback) callback();
+            }
+        }
+        typeChar();
     }
-    typeChar();
-}
 
     function clickToFocus(selector, callback) {
         const element = document.querySelector(selector);
